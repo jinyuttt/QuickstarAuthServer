@@ -45,7 +45,7 @@ namespace AuthServer
                     AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
                     RequireConsent=false,//如果不需要显示否同意授权 页面 这里就设置为false
                      // RedirectUris = { "https://localhost:44371/signin-oidc" },//登录成功后返回的客户端地址
-                  //  PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc" },//注销登录后返回的客户端地址
+                   PostLogoutRedirectUris = { "http://localhost:2002/signout-callback-oidc" },//注销登录后返回的客户端地址
                     ClientSecrets = { new Secret("secret".Sha256()) },
                      RequirePkce=false,
                      RedirectUris={ "https://localhost:2002/signin-oidc" },

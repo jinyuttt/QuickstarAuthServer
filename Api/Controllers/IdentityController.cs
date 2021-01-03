@@ -24,15 +24,11 @@ namespace Api.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        //[HttpGet]
-        //public ActionResult Test()
-        //{
-        //    return new JsonResult("resr");
-        //}
-        [HttpPost]
+       
+        [HttpGet("Logout")]
         public IActionResult Logout()
         {
-            Console.WriteLine("Logout");
+           
             return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
             //await HttpContext.SignOutAsync("Cookies");
             //await HttpContext.SignOutAsync("oidc");

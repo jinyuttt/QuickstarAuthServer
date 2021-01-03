@@ -1,9 +1,11 @@
-﻿using IdentityServer4.Services;
+﻿using AuthServer.Models;
+using IdentityServer4.Events;
+using IdentityServer4.Extensions;
+using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
@@ -18,6 +20,7 @@ namespace AuthServer.Controllers
         private readonly IClientStore _clientStore;
         private readonly Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
+       
         public AccountController(IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider schemeProvider,
@@ -35,7 +38,7 @@ namespace AuthServer.Controllers
         /// 登录页面
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public  IActionResult Login(string returnUrl = null)
         {
             ViewData["returnUrl"] = returnUrl;
             return View();
@@ -88,10 +91,75 @@ namespace AuthServer.Controllers
                 return View();
             }
         }
-        public async Task Logout(string logoutId)
+
+        [HttpGet]
+        public IActionResult Logout(string logoutId)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+            
+            // await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+
+            LoggedOutViewModel logged = new LoggedOutViewModel();
+            logged.LogoutId = logoutId;
+            //获取客户端点击注销登录的地址
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+            return View(logged);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> LogoutSub(string logoutId)
+        {
+            LoggedOutViewModel logged = new LoggedOutViewModel();
+
+            logged.LogoutId = logoutId;
+            #region IdentityServer4 退出登录后，默认会跳转到Config.Client配置的PostLogoutRedirectUris地址,做如下改动，则会动态的跳转到原来的地址
+            var logout = await _interaction.GetLogoutContextAsync(logoutId);
+
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            await HttpContext.SignOutAsync();
+            if (logout != null)
+            {
+                logged.ClientName = logout.ClientName;
+                logged.PostLogoutRedirectUri = logout.PostLogoutRedirectUri;
+
+            }
+            if (logout.PostLogoutRedirectUri != null)
+            {
+                return Redirect(logout.PostLogoutRedirectUri);
+            }
+           
+            return View("LoggedOut", logged);
+            #endregion
+        }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> Logout(LoggedOutViewModel model)
+        //{
+        //    if (User?.Identity.IsAuthenticated == true)
+        //    {
+        //        // delete local authentication cookie
+        //        await HttpContext.SignOutAsync();
+
+        //        // raise the logout event
+        //        await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));
+        //    }
+        //    if (model.TriggerExternalSignout)
+        //    {
+        //        // build a return URL so the upstream provider will redirect back
+        //        // to us after the user has logged out. this allows us to then
+        //        // complete our single sign-out processing.
+        //        string url = Url.Action("Logout", new { logoutId = model.LogoutId });
+
+        //        // this triggers a redirect to the external provider for sign-out
+        //        return SignOut(new AuthenticationProperties { RedirectUri = url }, model.ExternalAuthenticationScheme);
+        //    }
+
+        //    return View("LoggedOut", model);
+        //}
+
     }
 }

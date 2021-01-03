@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,9 +29,10 @@ namespace AuthServer
                 options.UserInteraction =
                 new IdentityServer4.Configuration.UserInteractionOptions
                 {
+                    //设置IdentityServer4
                     LoginUrl = "/account/login",
                     LogoutUrl = "/account/logout",
-                   // LoginReturnUrlParameter = "returnUrl",
+                
                     LogoutIdParameter = "logoutid"
 
                 };
@@ -53,8 +56,12 @@ namespace AuthServer
                 .AddInMemoryClients(Config.GetClients())//把配置文件的Client配置资源放到内存
                .AddInMemoryApiResources(Config.GetApiResources())
                .AddInMemoryApiScopes(Config.Apis);//添加api资源
-            services.AddAuthentication("oidc")
-    .AddCookie("oidc", options =>
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+            })
+
+    .AddCookie(IdentityConstants.ApplicationScheme, options =>
     {
         options.ExpireTimeSpan = new System.TimeSpan(0, 1, 0);
        // options.LoginPath = "/account/login";
@@ -64,17 +71,15 @@ namespace AuthServer
             // 配置cookie策略
             services.Configure<CookiePolicyOptions>(options =>
             {
-                //https://docs.microsoft.com/zh-cn/aspnet/core/security/samesite?view=aspnetcore-3.1&viewFallbackFrom=aspnetcore-3
+               
                 options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
             });
             services.AddCors();
 
             services.AddDbContextPool<NpgsqlContext>(options =>
               {
-                  options.UseNpgsql(Configuration.GetConnectionString("conn"));
+                  options.UseNpgsql(Configuration.GetConnectionString("conn"));//注入DbContext
               });
-
-
             //services.AddDbContext<NpgsqlContext>(options => options.UseNpgsql(Configuration.GetConnectionString("conn")));//注入DbContext
             services.AddTransient<IAdminService, AdminService>();//service注入
 
@@ -102,9 +107,8 @@ namespace AuthServer
             app.UseRouting();
 
             app.UseIdentityServer();
-            app.UseAuthentication();
-
-            app.UseAuthorization();
+            app.UseAuthentication();//认证
+            app.UseAuthorization();//授权 新版本必须同时有认证授权 顺序不能变
            
 
             app.UseCookiePolicy();

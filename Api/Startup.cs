@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Api
@@ -37,14 +38,17 @@ namespace Api
            
             services.AddAuthentication(options =>
             {
+                //直接用默认值
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-               //options.DefaultScheme = "Cookies";
-                //options.DefaultChallengeScheme = "oidc"; //oidc => open id connect
+             
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+               
+                //options.DefaultScheme = "Cookies";
+                //options.DefaultChallengeScheme = "oidc"; //oidc => open id connect
 
             })    
              .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
-                 //options.LoginPath = "/api/Identity";
+                 options.LoginPath = "/api/Identity";
                  //无权限，显示的页面
                  options.AccessDeniedPath = "/Authorization/AccessDenied";
                  options.ExpireTimeSpan = new System.TimeSpan(0, 1, 0);
@@ -60,11 +64,11 @@ namespace Api
                  options.RequireHttpsMetadata = false;
                  options.ClientSecret = "secret";
                  options.ClientId = "clientid";
-                 //options.Scope.Add("offline_access");
                  options.SaveTokens = true;
                  options.GetClaimsFromUserInfoEndpoint = true;
                  options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                  options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
+               
                  options.TokenValidationParameters = new TokenValidationParameters
                  {
                      NameClaimType = "name",
