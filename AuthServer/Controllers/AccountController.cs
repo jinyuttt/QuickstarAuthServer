@@ -1,5 +1,8 @@
 ﻿using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,7 +13,7 @@ namespace AuthServer.Controllers
 {
     public class AccountController : Controller
     {
-        private IAdminService _adminService;//自己写的操作数据库Admin表的service
+        private readonly IAdminService _adminService;//自己写的操作数据库Admin表的service
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider _schemeProvider;
@@ -48,27 +51,29 @@ namespace AuthServer.Controllers
             Admin user = await _adminService.GetByStr(userName, password);
             if (user != null)
             {
-                Microsoft.AspNetCore.Authentication.AuthenticationProperties props = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+                AuthenticationProperties props = new AuthenticationProperties
                 {
                     IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.Add(TimeSpan.FromDays(1))
+                    ExpiresUtc = DateTimeOffset.Now.Add(TimeSpan.FromMinutes(5))
                 };
                
                 Claim nameClaim = new Claim(ClaimTypes.Name, user.UserName);
                 Claim idClaim = new Claim(ClaimTypes.Sid, user.Id.ToString());
-                //Claim genderClaim = new Claim(ClaimTypes.Gender, "female");
-                //Claim countryClaim = new Claim(ClaimTypes.Country, "china");
+                Claim genderClaim = new Claim(ClaimTypes.Gender, "female");
+                Claim countryClaim = new Claim(ClaimTypes.Country, "china");
               
-                ClaimsIdentity id = new ClaimsIdentity("身份证");
-                id.AddClaim(nameClaim);
-                id.AddClaim(idClaim);
-                //id.AddClaim(genderClaim);
+                //ClaimsIdentity id = new ClaimsIdentity("身份证");
+                //id.AddClaim(nameClaim);
+                //id.AddClaim(idClaim);
                 //id.AddClaim(countryClaim);
-                //AuthenticationManagerExtensions.SignInAsync()
-                ClaimsPrincipal principal = new ClaimsPrincipal(id);
+                //id.AddClaim(genderClaim);
+               
+              //  ClaimsPrincipal principal = new ClaimsPrincipal(id);
                 IdentityServer4.IdentityServerUser serverUser = new IdentityServer4.IdentityServerUser("身份证");
                 serverUser.AdditionalClaims.Add(nameClaim);
                 serverUser.AdditionalClaims.Add(idClaim);
+                serverUser.AdditionalClaims.Add(countryClaim);
+                serverUser.AdditionalClaims.Add(genderClaim);
 
                 await HttpContext.SignInAsync(serverUser, props);
                 if (returnUrl != null)
@@ -82,6 +87,11 @@ namespace AuthServer.Controllers
             {
                 return View();
             }
+        }
+        public async Task Logout(string logoutId)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         }
     }
 }

@@ -1,28 +1,41 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class IdentityController : ControllerBase
     {
+        //[HttpGet]
+        //public IActionResult Get()
+        //{
+        //    return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
+        //}
         [HttpGet]
-        public IActionResult Get()
+        [Authorize]
+        public ActionResult<IEnumerable<string>> Get()
         {
-            return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
+            return new string[] { "value1", "value2" };
         }
 
+        //[HttpGet]
+        //public ActionResult Test()
+        //{
+        //    return new JsonResult("resr");
+        //}
         [HttpPost]
         public IActionResult Logout()
         {
-            return SignOut("Cookies", "oidc");
+            Console.WriteLine("Logout");
+            return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
+            //await HttpContext.SignOutAsync("Cookies");
+            //await HttpContext.SignOutAsync("oidc");
         }
     }
 }

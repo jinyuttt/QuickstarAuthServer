@@ -1,4 +1,5 @@
 ﻿using AuthServer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,18 +10,22 @@ using System.Threading.Tasks;
 
 namespace AuthServer.Controllers
 {
+    
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private IAdminService adminService;
+        public HomeController(IAdminService _adminService)
         {
-            _logger = logger;
+            adminService = _adminService;
         }
 
         public IActionResult Index()
         {
+           
             return View();
+           
         }
 
         public IActionResult Privacy()
@@ -33,5 +38,28 @@ namespace AuthServer.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        ///// <summary>
+        ///// Shows the error page
+        ///// </summary>
+        //public  IActionResult Error(string errorId)
+        //{
+        //    var vm = new ErrorViewModel();
+
+        //    // retrieve error details from identityserver
+        //    //var message = await _interaction.GetErrorContextAsync(errorId);
+        //    //if (message != null)
+        //    //{
+        //    //    vm.Error = message;
+
+        //    //    if (!_environment.IsDevelopment())
+        //    //    {
+        //    //        // only show in development
+        //    //        message.ErrorDescription = null;
+        //    //    }
+        //    //}
+
+        //    return View("Error", vm);
+        //}
     }
 }

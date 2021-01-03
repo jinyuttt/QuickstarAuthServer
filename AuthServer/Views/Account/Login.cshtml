@@ -1,15 +1,34 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = null;
 }
 
-<<div align="center"><h1>这里是受保护的客户端首页</h1></div>
-<h3>User claims</h3>
+<!DOCTYPE html>
 
-<dl>
-    @foreach (var claim in User.Claims)
-    {
-        <dt>@claim.Type</dt>
-        <dd>@claim.Value</dd>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <script>
+        new Oidc.UserManager().signinRedirectCallback().then(function (user) {
+            alert("登录成功后跳转");
+            alert(user.state);
+            window.location = user.state;
+        }).catch(function (e) {
+            console.error(e);
+        });
+    </script>
+</head>
+<body>
 
-    }
-</dl>
+    <div align="center">
+        <h1>统一认证登录中心</h1>
+        <form action="/Account/Login" method="post">
+            用户名：<input type="text" name="userName" /><br />
+            密 码：<input type="password" name="password" />
+            <input type="hidden" name="returnUrl" value="@ViewData["returnUrl"]" /> <br />
+            <input type="submit" value="登录" />
+           
+        </form>
+    </div>
+</body>
+</html>
