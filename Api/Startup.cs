@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace Api
                  options.LoginPath = "/api/Identity";
                  //无权限，显示的页面
                  options.AccessDeniedPath = "/Authorization/AccessDenied";
-                 options.ExpireTimeSpan = new System.TimeSpan(0, 1, 0);
+                 options.ExpireTimeSpan = new System.TimeSpan(1, 1, 0);
                  //options.ReturnUrlParameter = "/api/Identity";
              })
              .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
@@ -86,7 +87,10 @@ namespace Api
                      OnRemoteFailure = OAuthFailureHandler =>
                      {
                          //跳转首页
-                         OAuthFailureHandler.Response.Redirect("/");
+                         Log.Logger.Information("远程异常");
+
+                         //WeatherForecast
+                         OAuthFailureHandler.Response.Redirect("/api/Identity");
                          OAuthFailureHandler.HandleResponse();
                          return Task.FromResult(0);
                      }

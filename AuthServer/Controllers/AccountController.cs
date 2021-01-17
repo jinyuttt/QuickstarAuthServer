@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace AuthServer.Controllers
         private readonly IAdminService _adminService;//自己写的操作数据库Admin表的service
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
-        private readonly Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider _schemeProvider;
+        private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
        
         public AccountController(IIdentityServerInteractionService interaction,
@@ -51,6 +52,7 @@ namespace AuthServer.Controllers
         public async Task<IActionResult> Login(string userName, string password, string returnUrl = null)
         {
             ViewData["returnUrl"] = returnUrl;
+            Log.Logger.Debug("登录返回" + returnUrl);
             Admin user = await _adminService.GetByStr(userName, password);
             if (user != null)
             {
@@ -84,7 +86,7 @@ namespace AuthServer.Controllers
                     return Redirect(returnUrl);
                 }
 
-                return View();
+                 return Redirect("/Home/Index");
             }
             else
             {
@@ -95,15 +97,16 @@ namespace AuthServer.Controllers
         [HttpGet]
         public IActionResult Logout(string logoutId)
         {
-            
-            // await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
+            // await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+            Log.Logger.Debug("退出ID" + logoutId);
             LoggedOutViewModel logged = new LoggedOutViewModel();
             logged.LogoutId = logoutId;
             //获取客户端点击注销登录的地址
             var refererUrl = Request.Headers["Referer"].ToString();
             if (!string.IsNullOrEmpty(refererUrl))
             {
+                Log.Logger.Debug("退出页面" + refererUrl);
                 return Redirect(refererUrl);
             }
             return View(logged);

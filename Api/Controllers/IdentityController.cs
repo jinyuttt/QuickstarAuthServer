@@ -28,7 +28,7 @@ namespace Api.Controllers
         [HttpGet("Logout")]
         public IActionResult Logout()
         {
-           
+          
             return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
             //await HttpContext.SignOutAsync("Cookies");
             //await HttpContext.SignOutAsync("oidc");

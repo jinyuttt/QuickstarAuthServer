@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Diagnostics;
 
 namespace AuthServer
@@ -11,6 +12,8 @@ namespace AuthServer
     {
         public static void Main(string[] args)
         {
+
+            Console.Title = "AuthServer";
 
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 

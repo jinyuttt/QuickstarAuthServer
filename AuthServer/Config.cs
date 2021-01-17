@@ -21,22 +21,7 @@ namespace AuthServer
         {
             return new List<Client>
             {
-                 new Client
-                {
-                    ClientId = "client",
-
-                    // no interactive user, use the clientid/secret for authentication
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-                    // secret for authentication
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-
-                    // scopes that client has access to
-                    AllowedScopes = { "api1" }
-                },
+                
                 // OpenID Connect隐式流客户端（MVC）
                 new Client
                 {
@@ -50,10 +35,10 @@ namespace AuthServer
                      RequirePkce=false,
                      RedirectUris={ "https://localhost:2002/signin-oidc" },
                       
-                      AccessTokenLifetime=60,
+                    //  AccessTokenLifetime=60,
                         AllowOfflineAccess = true,
                          AlwaysIncludeUserClaimsInIdToken = true,
-                          AccessTokenType = AccessTokenType.Reference,
+                        //  AccessTokenType = AccessTokenType.Reference,
                           AllowAccessTokensViaBrowser=true,//允许浏览器传输
                     AllowedScopes =//下面这两个必须要加吧 不太明白啥意思
                     {
