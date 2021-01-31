@@ -16,8 +16,8 @@ namespace Client
         static HttpClient _apiClient = new HttpClient { BaseAddress = new Uri("https://localhost:2002/api/identity") };
         static async System.Threading.Tasks.Task Main(string[] args)
         {
-           //await SignIn();
-           await NewMethod();
+           await SignIn();
+          // await NewMethod();
             Console.WriteLine("Hello World!");
         }
 
@@ -135,7 +135,7 @@ namespace Client
             {
                 Authority = "https://localhost:5001",
                 ClientId = "clientid",
-                RedirectUri = redirectUri,
+                RedirectUri = "https://localhost:2002/signin-oidc",
                 Scope = "offline_access openid profile api1 ",
                 FilterClaims = false,
                 ClientSecret = "secret",
@@ -147,8 +147,7 @@ namespace Client
             
                 Browser = browser,
 
-                Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
+               
                 //RefreshTokenInnerHttpHandler = new HttpClientHandler(),
                
             };
@@ -164,19 +163,21 @@ namespace Client
             _oidcClient = new OidcClient(options);
             var result = await _oidcClient.LoginAsync(new LoginRequest()
             {
+                 FrontChannel=new FrontChannelParameters()
+                 {
+                     Extra = new Parameters(new[]{
+                     new KeyValuePair<string,string>("username","admin"),
+                    new KeyValuePair<string, string>("password","123"),
+                    new KeyValuePair<string, string>("returnUrl","https://localhost:2002/api/identity"),
+                    })
+                 }
 
-                FrontChannelExtraParameters = new Dictionary<string, string>(
-                 new Parameters(new[]{
-                     new KeyValuePair<string,string>("username","admin"),
-                     new KeyValuePair<string, string>("password","123"),
-                     new KeyValuePair<string, string>("returnUrl","https://localhost:2002/api/identity"),
-                 })),
-                 BackChannelExtraParameters=new Dictionary<string,string>(
-  new Parameters(new[]{
-                     new KeyValuePair<string,string>("username","admin"),
-                     new KeyValuePair<string, string>("password","123"),
-                     new KeyValuePair<string, string>("returnUrl","https://localhost:2002/api/identity"),
-                 })),
+                 //new Parameters(new[]{
+                 //    new KeyValuePair<string,string>("username","admin"),
+                 //    new KeyValuePair<string, string>("password","123"),
+                 //    new KeyValuePair<string, string>("returnUrl","https://localhost:2002/api/identity"),
+                 //})),
+
 
             }); 
 

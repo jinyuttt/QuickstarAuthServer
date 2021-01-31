@@ -49,11 +49,11 @@ namespace Api
 
             })    
              .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
-                 options.LoginPath = "/api/Identity";
+                options.LoginPath = "/api/Identity";
                  //无权限，显示的页面
                  options.AccessDeniedPath = "/Authorization/AccessDenied";
                  options.ExpireTimeSpan = new System.TimeSpan(1, 1, 0);
-                 //options.ReturnUrlParameter = "/api/Identity";
+                // options.ReturnUrlParameter = "/api/Identity";
              })
              .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
              {
@@ -67,7 +67,7 @@ namespace Api
                  options.ClientId = "clientid";
                  options.SaveTokens = true;
                  options.GetClaimsFromUserInfoEndpoint = true;
-                 options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                 options.ResponseType = OpenIdConnectResponseType.Code;
                  options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
                
                  options.TokenValidationParameters = new TokenValidationParameters

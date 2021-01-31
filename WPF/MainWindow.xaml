@@ -1,0 +1,24 @@
+﻿<Window x:Class="WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:winforms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:cefSharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf" 
+        
+        Title="MainWindow" Height="450" Width="800"
+         Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button  Command="{Binding ExitCommand}"></Button>
+        <cefSharp:ChromiumWebBrowser Name="mychrome"></cefSharp:ChromiumWebBrowser>
+        <!--<WindowsFormsHost Grid.Row="1">
+            <winforms:WebBrowser x:Name="wb" ScriptErrorsSuppressed="True"></winforms:WebBrowser>
+        </WindowsFormsHost>-->
+        <!--<WindowsFormsHost>
+            <winforms:WebBrowser x:Name="wb" ScriptErrorsSuppressed="True"></winforms:WebBrowser>
+        </WindowsFormsHost>-->
+        <!--<WebBrowser Grid.Row="1" x:Name="MyIE" Source="https://localhost:2002/api/Identity"></WebBrowser>-->
+    </Grid>
+</Window>

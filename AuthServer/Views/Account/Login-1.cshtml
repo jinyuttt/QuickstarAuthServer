@@ -1,0 +1,38 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/css/Index_Log.css" />
+    @*<script>
+            new Oidc.UserManager().signinRedirectCallback().then(function (user) {
+                alert("登录成功后跳转");
+                alert(user.state);
+                window.location = user.state;
+            }).catch(function (e) {
+                console.error(e);
+            });
+        </script>*@
+</head>
+<body>
+
+    <div align="center" class="login">
+        <h1>统一认证登录中心</h1>
+        <div class="login_box">
+
+            <form action="/Account/Login" method="post">
+                用户名：<input type="text" name="userName" required /><br />
+                密 码：<input type="password" name="password" required />
+                <input type="hidden" name="returnUrl" value="@ViewData["returnUrl"]" /> <br />
+                <input type="submit" value="登录" />
+
+            </form>
+        </div>
+    </div>
+</body>
+</html>
